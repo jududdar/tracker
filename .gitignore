@@ -12,6 +12,9 @@
 /.buildpath
 /.externalToolBuilders
 
+#netbeans - project settings
+/.nbproject
+
 # Numerous always-ignore extensions
 *.diff
 *.err
@@ -23,6 +26,7 @@
 *.vi
 *~
 *.sass-cache
+*.dbc
 
 # OS or Editor folders
 .DS_Store
@@ -41,3 +45,4 @@ Thumbs.db
 
 # Assets
 
+/config.php
