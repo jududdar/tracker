@@ -1,12 +1,12 @@
 <?php
 
-$mangosdb = "zp_world";
-$trackerdb = "zp_tracker";
+$mangosdb = "WotLK_world";
+$trackerdb = "WotLK_tracker";
 $characterdb = ""; //Set this to a non-empty value to enable viewing character quest progress in the tracker
 
 $server = "localhost";
-$user = "zp";
-$password = "zpdb";
+$user = "username";
+$password = "password";
 
 $title = "Quest Tracker";
 
