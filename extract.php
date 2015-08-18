@@ -31,15 +31,15 @@ $handled_dbc_files = Array(
  */
 $dbc_unpack_strings = Array(
     Array("string" => "L1id/Lfield1/Lfield2/L8unk/Lstring1", "fields" => 2, "strings" => 1), //AreaTable
-    Array("string" => "L1id/L4unk/L1string1", "fields" => 0, "strings" => 1), //ChrClasses
-    Array("string" => "L1id/L14unk/L1string1", "fields" => 0, "strings" => 1), //ChrRaces
+    Array("string" => "L1id/L3unk/L1string1", "fields" => 0, "strings" => 1), //ChrClasses
+    Array("string" => "L1id/L10unk/L1string1", "fields" => 0, "strings" => 1), //ChrRaces
     Array("string" => "L1id/L1string1", "fields" => 0, "strings" => 1), //Emotes
-    Array("string" => "L1id/L18unk/L1string1", "fields" => 0, "strings" => 1), //Faction
-    Array("string" => "L1id/Lunk/Lfield1/L1unk/Lstring1/L12unk/f2unk/Lfield2", "fields" => 2, "strings" => 1), //Map
+    Array("string" => "L1id/L22unk/L1string1", "fields" => 0, "strings" => 1), //Faction
+    Array("string" => "L1id/Lunk/Lfield1/L2unk/Lstring1/L9unk/f2unk/Lfield2", "fields" => 2, "strings" => 1), //Map
     Array("string" => "L1id/L1string1", "fields" => 0, "strings" => 1), //QuestInfo
     Array("string" => "L1id/L1string1", "fields" => 0, "strings" => 1), //QuestSort
     Array("string" => "L1id/L2unk/L1string1", "fields" => 0, "strings" => 1), //Skilline
-    Array("string" => "L1id/L119unk/Lstring1", "fields" => 0, "strings" => 1), //Spell
+    Array("string" => "L1id/L135unk/Lstring1", "fields" => 0, "strings" => 1), //Spell
 );
 
 /**
