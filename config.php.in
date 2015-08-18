@@ -1,6 +1,6 @@
 <?php
 
-$mangosdb = "WotLK_world";
+$trinitydb = "WotLK_world";
 $trackerdb = "WotLK_tracker";
 $characterdb = ""; //Set this to a non-empty value to enable viewing character quest progress in the tracker
 

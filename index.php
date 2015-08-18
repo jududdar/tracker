@@ -16,8 +16,8 @@ function id2nick($id) {
 }
 
 function id2name($table, $id) {
-    global $mangosdb;
-    return mysql_result(mysql_query("SELECT name FROM $mangosdb.$table WHERE entry=" . $id), 0);
+    global $trinitydb;
+    return mysql_result(mysql_query("SELECT name FROM $trinitydb.$table WHERE entry=" . $id), 0);
 }
 
 function get_queststatus($quest, $table=false)
@@ -121,8 +121,8 @@ $statuscolor = Array(
     "gray",
     "#f0f");
 
-mysql_connect($server, $user, $password, $mangosdb);
-mysql_select_db($mangosdb);
+mysql_connect($server, $user, $password, $trinitydb);
+mysql_select_db($trinitydb);
 
 
 $database_version = Array();
@@ -256,7 +256,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
 ?>
 <html>
     <head>
-        <title><?php echo $title;?> - <?php echo mysql_result(mysql_query("SELECT version FROM $mangosdb.db_version"), 0); ?></title>
+        <title><?php echo $title;?> - <?php echo mysql_result(mysql_query("SELECT version FROM $trinitydb.db_version"), 0); ?></title>
         <script type="text/javascript" src="http://static.wowhead.com/widgets/power.js"></script>
         <style>
             body, td, div { font-family:Helvetica,Arial,sans-serif; font-size:12px;}
@@ -391,13 +391,13 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
               if (isset($_GET["search"])) {
                   echo "Search results</td><td class=login>$login</td></tr>";
                   if (is_numeric($query)) {
-                      $count = mysql_result(mysql_query("SELECT COUNT(entry) FROM $mangosdb.quest_template WHERE entry = " . mysql_real_escape_string($query)), 0);
+                      $count = mysql_result(mysql_query("SELECT COUNT(entry) FROM $trinitydb.quest_template WHERE entry = " . mysql_real_escape_string($query)), 0);
                       if ($count == 0) {
                           echo "<tr><td colspan=4>No entries found</td></tr>";
                           continue;
                       } else {
                           echo "<tr><td>Quest ID</td><td>Name</td><td>Reported Status</td></tr>";
-                          $sql = mysql_query("SELECT entry, Title FROM $mangosdb.quest_template WHERE entry = " . mysql_real_escape_string($query));
+                          $sql = mysql_query("SELECT entry, Title FROM $trinitydb.quest_template WHERE entry = " . mysql_real_escape_string($query));
                           while ($row = mysql_fetch_assoc($sql)) {
                               $res2 = mysql_query("SELECT status, dbver FROM $trackerdb.status WHERE quest_id = " . $row["entry"] . " AND dbver>=" . $c_database_version . " GROUP BY status ASC, dbver DESC");
                               $queststatus = "";
@@ -415,13 +415,13 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                           continue;
                       }
 
-                      $count = mysql_result(mysql_query("SELECT COUNT(entry) FROM $mangosdb.quest_template WHERE Title LIKE \"%" . mysql_real_escape_string($query) . "%\""), 0);
+                      $count = mysql_result(mysql_query("SELECT COUNT(entry) FROM $trinitydb.quest_template WHERE Title LIKE \"%" . mysql_real_escape_string($query) . "%\""), 0);
                       if ($count == 0) {
                           echo "<tr><td colspan=4>No entries found</td></tr>";
                           die();
                       } else {
                           echo "<tr><td>Quest ID</td><td>Name</td><td>Reported Status</td></tr>";
-                          $sql = mysql_query("SELECT entry, Title FROM $mangosdb.quest_template WHERE Title LIKE \"%" . mysql_real_escape_string($query) . "%\"");
+                          $sql = mysql_query("SELECT entry, Title FROM $trinitydb.quest_template WHERE Title LIKE \"%" . mysql_real_escape_string($query) . "%\"");
                           while ($row = mysql_fetch_assoc($sql)) {
                               $res2 = mysql_query("SELECT status, dbver FROM $trackerdb.status WHERE quest_id = " . $row["entry"] . " AND dbver>=" . $c_database_version . " GROUP BY status ASC, dbver DESC");
                               $queststatus = "";
@@ -457,7 +457,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   $sql = mysql_query("SELECT entry, problem FROM $trackerdb.problems WHERE entry NOT IN (SELECT quest_id FROM $trackerdb.status) ORDER BY entry ASC LIMIT $offset, 50");
                   while ($row = mysql_fetch_array($sql)) {
                       echo "<tr>";
-                      echo "<td colspan=2><a href=index.php?showrev=$show_data_for_rev&filterstatus=$filter_status&quest=" . $row["entry"] . ">" . $row["entry"] . " - " . mysql_result(mysql_query("SELECT Title FROM $mangosdb.quest_template WHERE entry =" . $row["entry"]), 0) . "</a></td>";
+                      echo "<td colspan=2><a href=index.php?showrev=$show_data_for_rev&filterstatus=$filter_status&quest=" . $row["entry"] . ">" . $row["entry"] . " - " . mysql_result(mysql_query("SELECT Title FROM $trinitydb.quest_template WHERE entry =" . $row["entry"]), 0) . "</a></td>";
                       echo "<td colspan=2>";
                       for ($i = 0; $i < count($problems); $i++)
                           if ($row["problem"] & 1 << $i)
@@ -493,7 +493,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   $sql = mysql_query("SELECT quest_id, dbver, user, report, status, ts FROM $trackerdb.status WHERE 1 $dbver $filter AND dbver >= $c_database_version ORDER BY ts DESC LIMIT $offset, 50");
                   while ($row = mysql_fetch_array($sql)) {
                       echo "<tr>";
-                      echo "<td><a href=index.php?showrev=$show_data_for_rev&quest=" . $row["quest_id"] . ">" . $row["quest_id"] . " - " . mysql_result(mysql_query("SELECT Title FROM $mangosdb.quest_template WHERE entry =" . $row["quest_id"]), 0) . "</a></td>";
+                      echo "<td><a href=index.php?showrev=$show_data_for_rev&quest=" . $row["quest_id"] . ">" . $row["quest_id"] . " - " . mysql_result(mysql_query("SELECT Title FROM $trinitydb.quest_template WHERE entry =" . $row["quest_id"]), 0) . "</a></td>";
                       echo "<td>" . mysql_result(mysql_query("SELECT name FROM $trackerdb.users WHERE id =" . $row["user"]), 0) . "</td>";
                       echo "<td><span class=\"tag tag" . $row["status"] . "\" title=\"" . $status[$row["status"]] . "\">" . $database_version[$row["dbver"]] . "</span></td>";
                       echo "<td>" . nl2br($row["report"]) . "</br><i>" . date("d.m.Y H:i:s", $row["ts"]) . "</td>";
@@ -519,23 +519,23 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   //Build the map list
                   $list = Array();
                   //First a total count
-                  $all = mysql_fetch_assoc(mysql_query("SELECT COUNT(entry) AS num,group_concat(DISTINCT ZoneOrSort SEPARATOR \",\") AS zones FROM $mangosdb.quest_template"));
+                  $all = mysql_fetch_assoc(mysql_query("SELECT COUNT(entry) AS num,group_concat(DISTINCT ZoneOrSort SEPARATOR \",\") AS zones FROM $trinitydb.quest_template"));
                   $list[] = Array("num"=>$all["num"], "zones"=>$all["zones"], "map"=>"x", "name"=>"All Quests", "type"=>-1);
 
                   //Regular Maps, Instances, Raids, BGs
-                  $sql = mysql_query("SELECT count( mq.entry ) AS num, group_concat(DISTINCT mq.ZoneOrSort SEPARATOR \",\") AS zones, ta.map, tm.name, tm.type FROM $mangosdb.quest_template AS mq, $trackerdb.areatable AS ta, $trackerdb.map AS tm WHERE mq.ZoneOrSort >0 AND mq.ZoneOrSort = ta.id AND ta.map = tm.id GROUP BY tm.id ASC ORDER BY tm.type, ta.map ASC");
+                  $sql = mysql_query("SELECT count( mq.entry ) AS num, group_concat(DISTINCT mq.ZoneOrSort SEPARATOR \",\") AS zones, ta.map, tm.name, tm.type FROM $trinitydb.quest_template AS mq, $trackerdb.areatable AS ta, $trackerdb.map AS tm WHERE mq.ZoneOrSort >0 AND mq.ZoneOrSort = ta.id AND ta.map = tm.id GROUP BY tm.id ASC ORDER BY tm.type, ta.map ASC");
                   while ($row = mysql_fetch_assoc($sql))
                   {
                       $list[] = $row;
                   }
                   //Profession, Class and Event quests need custom grouping
-                  $professions_count = mysql_result(mysql_query("SELECT COUNT(entry) AS num FROM $mangosdb.quest_template WHERE ZoneOrSort IN (" . $zos_profession . ")"),0);
+                  $professions_count = mysql_result(mysql_query("SELECT COUNT(entry) AS num FROM $trinitydb.quest_template WHERE ZoneOrSort IN (" . $zos_profession . ")"),0);
                   $list[] = Array("num"=>$professions_count, "zones"=>$zos_profession, "map"=>"p", "name"=>"Profession", "type"=>999);
-                  $class_count = mysql_result(mysql_query("SELECT COUNT(entry) AS num FROM $mangosdb.quest_template WHERE ZoneOrSort IN (" . $zos_class . ")"),0);
+                  $class_count = mysql_result(mysql_query("SELECT COUNT(entry) AS num FROM $trinitydb.quest_template WHERE ZoneOrSort IN (" . $zos_class . ")"),0);
                   $list[] = Array("num"=>$class_count, "zones"=>$zos_class, "map"=>"c", "name"=>"Class", "type"=>999);
-                  $event = mysql_fetch_assoc(mysql_query("SELECT COUNT(entry) AS num,group_concat(DISTINCT ZoneOrSort SEPARATOR \",\") AS zones FROM $mangosdb.quest_template WHERE ZoneOrSort <0 AND ZoneOrSort NOT IN (" . $zos_class . "," . $zos_profession . ")"),0);
+                  $event = mysql_fetch_assoc(mysql_query("SELECT COUNT(entry) AS num,group_concat(DISTINCT ZoneOrSort SEPARATOR \",\") AS zones FROM $trinitydb.quest_template WHERE ZoneOrSort <0 AND ZoneOrSort NOT IN (" . $zos_class . "," . $zos_profession . ")"),0);
                   $list[] = Array("num"=>$event["num"], "zones"=>$event["zones"], "map"=>"e", "name"=>"Event", "type"=>999);
-                  $other_count = mysql_result(mysql_query("SELECT COUNT(entry) AS num FROM $mangosdb.quest_template WHERE ZoneOrSort = 0"),0);
+                  $other_count = mysql_result(mysql_query("SELECT COUNT(entry) AS num FROM $trinitydb.quest_template WHERE ZoneOrSort = 0"),0);
                   $list[] = Array("num"=>$other_count, "zones"=>0, "map"=>"u", "name"=>"Other/Unknown", "type"=>999);
 
                   $prev_type = "";
@@ -549,11 +549,11 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                           echo "<tr><td colspan=4 style=background-color:#eee>".$map_types[$line["type"]]."</td></tr>";
                           echo "<tr><td>Name</td><td>Quests total</td><td>Trac Progress (<font color=black>unk</font>/<font color=red>bug</font>/<font color=brown>core</font>/<font color=orange>script</font>/<font color=darkcyan>DB</font>/<font color=green>ok</font>/<font color=blue>blizzlike</font>/<font color=#f0f>PLZ Test!!</font>)</td><td>working</td></tr>";
                       }
-                      $unknown = $line["num"] - mysql_result(mysql_query("SELECT COUNT(DISTINCT quest_id) FROM $trackerdb.status WHERE quest_id IN (SELECT entry FROM $mangosdb.quest_template WHERE ZoneOrSort IN (".$line["zones"].")) AND status > 0 AND (dbver=" . (is_numeric($show_data_for_rev) ? $show_data_for_rev : "0 or dbver>0") . ")"), 0);
+                      $unknown = $line["num"] - mysql_result(mysql_query("SELECT COUNT(DISTINCT quest_id) FROM $trackerdb.status WHERE quest_id IN (SELECT entry FROM $trinitydb.quest_template WHERE ZoneOrSort IN (".$line["zones"].")) AND status > 0 AND (dbver=" . (is_numeric($show_data_for_rev) ? $show_data_for_rev : "0 or dbver>0") . ")"), 0);
                       $track_status = "";
                       $working = array();
                       for ($j = 1; $j < count($status); $j++) {
-                          $working[$j] = mysql_result(mysql_query("SELECT COUNT(DISTINCT quest_id) FROM $trackerdb.status WHERE quest_id in (SELECT entry FROM $mangosdb.quest_template WHERE ZoneOrSort IN (".$line["zones"].")) AND status = $j AND (dbver=" . (is_numeric($show_data_for_rev) ? $show_data_for_rev : "0 or dbver>0") . ")"), 0);
+                          $working[$j] = mysql_result(mysql_query("SELECT COUNT(DISTINCT quest_id) FROM $trackerdb.status WHERE quest_id in (SELECT entry FROM $trinitydb.quest_template WHERE ZoneOrSort IN (".$line["zones"].")) AND status = $j AND (dbver=" . (is_numeric($show_data_for_rev) ? $show_data_for_rev : "0 or dbver>0") . ")"), 0);
                           if ($working[$j] != 0 && (!is_numeric($filter_status) || $filter_status==$j))
                               $track_status .="/<font color=" . $statuscolor[$j] . ">" . $working[$j] . "</font>";
                       }
@@ -593,22 +593,22 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                       //zones
                       $mapname = mysql_result(mysql_query("SELECT name FROM $trackerdb.map WHERE id = $map"), 0);
                       $selector = "Zone";
-                      $sql = mysql_query("SELECT COUNT(m.entry) AS num, m.ZoneOrSort,t.id, t.name FROM $mangosdb.quest_template as m, $trackerdb.areatable as t WHERE t.map=$map AND t.id = m.ZoneOrSort GROUP BY m.ZoneOrSort ASC") or die(mysql_error());
+                      $sql = mysql_query("SELECT COUNT(m.entry) AS num, m.ZoneOrSort,t.id, t.name FROM $trinitydb.quest_template as m, $trackerdb.areatable as t WHERE t.map=$map AND t.id = m.ZoneOrSort GROUP BY m.ZoneOrSort ASC") or die(mysql_error());
                   } elseif ($map == "p") {
                        //professions
                       $mapname = "Professions";
                       $selector = "Profession";
-                      $sql = mysql_query("SELECT COUNT(m.entry) AS num, m.ZoneOrSort,t.id, t.name FROM $mangosdb.quest_template as m, $trackerdb.questsort as t WHERE t.id = -1*m.ZoneOrSort AND m.ZoneOrSort IN (".$zos_profession.") GROUP BY m.ZoneOrSort ASC") or die(mysql_error());
+                      $sql = mysql_query("SELECT COUNT(m.entry) AS num, m.ZoneOrSort,t.id, t.name FROM $trinitydb.quest_template as m, $trackerdb.questsort as t WHERE t.id = -1*m.ZoneOrSort AND m.ZoneOrSort IN (".$zos_profession.") GROUP BY m.ZoneOrSort ASC") or die(mysql_error());
                   } elseif ($map == "c") {
                        //classes
                       $mapname = "Classes";
                       $selector = "Class";
-                      $sql = mysql_query("SELECT COUNT(m.entry) AS num, m.ZoneOrSort,t.id, t.name FROM $mangosdb.quest_template as m, $trackerdb.questsort as t WHERE t.id = -1*m.ZoneOrSort AND m.ZoneOrSort IN (" . $zos_class . ") GROUP BY m.ZoneOrSort ASC") or die(mysql_error());
+                      $sql = mysql_query("SELECT COUNT(m.entry) AS num, m.ZoneOrSort,t.id, t.name FROM $trinitydb.quest_template as m, $trackerdb.questsort as t WHERE t.id = -1*m.ZoneOrSort AND m.ZoneOrSort IN (" . $zos_class . ") GROUP BY m.ZoneOrSort ASC") or die(mysql_error());
                   } elseif ($map == "e") {
                        //events
                       $mapname = "Events";
                       $selector = "Event";
-                      $sql = mysql_query("SELECT COUNT(m.entry) AS num, m.ZoneOrSort,t.id, t.name FROM $mangosdb.quest_template as m, $trackerdb.questsort as t WHERE t.id = -1*m.ZoneOrSort AND m.ZoneOrSort NOT IN (" . $zos_class . "," . $zos_profession . ") GROUP BY m.ZoneOrSort ASC") or die(mysql_error());
+                      $sql = mysql_query("SELECT COUNT(m.entry) AS num, m.ZoneOrSort,t.id, t.name FROM $trinitydb.quest_template as m, $trackerdb.questsort as t WHERE t.id = -1*m.ZoneOrSort AND m.ZoneOrSort NOT IN (" . $zos_class . "," . $zos_profession . ") GROUP BY m.ZoneOrSort ASC") or die(mysql_error());
                   } elseif ($map == "u") {
                       die("You should not have been able to come here...");
                   }
@@ -616,11 +616,11 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   echo "<tr><td>$selector</td><td>Quests total</td><td>Trac Progress (<font color=black>unk</font>/<font color=red>bug</font>/<font color=brown>core</font>/<font color=orange>script</font>/<font color=darkcyan>DB</font>/<font color=green>ok</font>/<font color=blue>blizzlike</font>/<font color=#f0f>PLZ Test!!</font>)</td><td>working</td></tr>";
 
                   while ($row = mysql_fetch_assoc($sql)) {//
-                      $unknown = $row["num"] - mysql_result(mysql_query("SELECT COUNT(DISTINCT quest_id) FROM $trackerdb.status WHERE quest_id IN (SELECT entry FROM $mangosdb.quest_template WHERE ZoneOrSort = ".$row["ZoneOrSort"].") AND status > 0 AND (dbver=" . (is_numeric($show_data_for_rev) ? $show_data_for_rev : "0 or dbver>0") . ")"), 0);
+                      $unknown = $row["num"] - mysql_result(mysql_query("SELECT COUNT(DISTINCT quest_id) FROM $trackerdb.status WHERE quest_id IN (SELECT entry FROM $trinitydb.quest_template WHERE ZoneOrSort = ".$row["ZoneOrSort"].") AND status > 0 AND (dbver=" . (is_numeric($show_data_for_rev) ? $show_data_for_rev : "0 or dbver>0") . ")"), 0);
                       $track_status = "";
                       $working = array();
                       for ($j = 1; $j < count($status); $j++) {
-                          $working[$j] = mysql_result(mysql_query("SELECT COUNT(DISTINCT quest_id) FROM $trackerdb.status WHERE quest_id in (SELECT entry FROM $mangosdb.quest_template WHERE ZoneOrSort = ".$row["ZoneOrSort"].") AND status = $j AND (dbver=" . (is_numeric($show_data_for_rev) ? $show_data_for_rev : "0 or dbver>0") . ")"), 0);
+                          $working[$j] = mysql_result(mysql_query("SELECT COUNT(DISTINCT quest_id) FROM $trackerdb.status WHERE quest_id in (SELECT entry FROM $trinitydb.quest_template WHERE ZoneOrSort = ".$row["ZoneOrSort"].") AND status = $j AND (dbver=" . (is_numeric($show_data_for_rev) ? $show_data_for_rev : "0 or dbver>0") . ")"), 0);
                           if ($working[$j] != 0 && (!is_numeric($filter_status) || $filter_status==$j))
                               $track_status .="/<font color=" . $statuscolor[$j] . ">" . $working[$j] . "</font>";
                       }
@@ -632,7 +632,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                       $percent_unknown = 100 - $percent_not_completable - $percent_completable;
                       $group_status = "<span class=\"tag tag5\" title=completable>$percent_completable %</span> <span class=\"tag tag1\" title=\"not completable\">$percent_not_completable %</span> <span class=\"tag tag0\" title=\"unknown\">$percent_unknown %</span>";
                       if(isset($character_name) && isset($char_id)){
-                          $char_num_rewarded= mysql_result(mysql_query("SELECT count(quest) AS num FROM $characterdb.character_queststatus WHERE guid = $char_id AND quest IN (SELECT entry FROM $mangosdb.quest_template WHERE ZoneOrSort = ".$row["ZoneOrSort"].") AND rewarded = 1"),0);
+                          $char_num_rewarded= mysql_result(mysql_query("SELECT count(quest) AS num FROM $characterdb.character_queststatus WHERE guid = $char_id AND quest IN (SELECT entry FROM $trinitydb.quest_template WHERE ZoneOrSort = ".$row["ZoneOrSort"].") AND rewarded = 1"),0);
                           $group_status .=" <span class=\"tag tag_char_rewarded\">$character_name $char_num_rewarded/".$row["num"]." rewarded</span>";
                       }
                       echo "<tr><td><a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&map=" . $map . "&areasort=".$row["ZoneOrSort"].">" . $row["name"] . "</a></td><td>" . $row["num"] . "</td><td>$track_status</td><td>".$group_status."</td>";
@@ -672,7 +672,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   echo "<a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&map=$map>$mapname</a>&nbsp;>>&nbsp;<a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&areasort=$areasort>$areaname</a>&nbsp;>>&nbsp;</td><td colspan=2 class=login>$login</td></tr>";
 
 
-                  $sql = mysql_query("SELECT m.entry, m.Title, m.RequiredRaces, m.QuestLevel FROM $mangosdb.quest_template as m WHERE m.ZoneOrSort =$areasort") or die(mysql_error());
+                  $sql = mysql_query("SELECT m.entry, m.Title, m.RequiredRaces, m.QuestLevel FROM $trinitydb.quest_template as m WHERE m.ZoneOrSort =$areasort") or die(mysql_error());
 
                   while ($row = mysql_fetch_assoc($sql)) {
                       $side_a = ($row["RequiredRaces"] == 0 || $row["RequiredRaces"] & 1101) ? "tag_alliance" : "tag_gray";
@@ -688,7 +688,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                 *
                 */
               elseif (is_numeric($quest)) {
-                  $row = mysql_fetch_assoc(mysql_query("SELECT * FROM $mangosdb.quest_template WHERE entry = $quest"));
+                  $row = mysql_fetch_assoc(mysql_query("SELECT * FROM $trinitydb.quest_template WHERE entry = $quest"));
 
                   //We must backcalculate the breadcrumbs
                   $areasort = $row["ZoneOrSort"];
@@ -731,27 +731,27 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                       echo "Suggested Players: " . $row["SuggestedPlayers"] . "</br>";
 
                   echo "<b>Quest Start:</b> ";
-                  if (mysql_result(mysql_query("SELECT COUNT(id) FROM $mangosdb.creature_questrelation WHERE quest=" . $quest), 0) > 0) {
-                      $creature_id = mysql_result(mysql_query("SELECT id FROM $mangosdb.creature_questrelation WHERE quest=" . $quest), 0);
-                      echo mysql_result(mysql_query("SELECT name FROM $mangosdb.creature_template WHERE entry=" . $creature_id), 0) . " (NPC) <a href=\"http://old.wowhead.com/npc=" . $creature_id . "\" target=_blank>Wowhead</a>";
-                  } else if (mysql_result(mysql_query("SELECT COUNT(id) FROM $mangosdb.gameobject_questrelation WHERE quest=" . $quest), 0) > 0)
-                      echo mysql_result(mysql_query("SELECT name FROM $mangosdb.gameobject_template WHERE entry=(SELECT id FROM $mangosdb.gameobject_questrelation WHERE quest=" . $quest . ")"), 0) . " (GO)";
-                  else if (mysql_result(mysql_query("SELECT COUNT(entry) FROM $mangosdb.item_template WHERE startquest=" . $quest), 0) > 0)
-                      echo mysql_result(mysql_query("SELECT name FROM $mangosdb.item_template WHERE startquest=" . $quest), 0) . " (Item)";
-                  else if (mysql_result(mysql_query("SELECT COUNT(id) FROM $mangosdb.game_event_creature_quest WHERE quest=" . $quest), 0) > 0) {
-                      $creature_id = mysql_result(mysql_query("SELECT id FROM $mangosdb.game_event_creature_quest WHERE quest=" . $quest), 0);
-                      echo mysql_result(mysql_query("SELECT name FROM $mangosdb.creature_template WHERE entry=" . $creature_id), 0) . " (NPC) during event " . mysql_result(mysql_query("SELECT description FROM $mangosdb.game_event WHERE entry=(SELECT event FROM $mangosdb.game_event_creature_quest WHERE quest=" . $quest . ")"), 0) . " <a href=\"http://old.wowhead.com/npc=" . $creature_id . "\" target=_blank>Wowhead</a>";
+                  if (mysql_result(mysql_query("SELECT COUNT(id) FROM $trinitydb.creature_questrelation WHERE quest=" . $quest), 0) > 0) {
+                      $creature_id = mysql_result(mysql_query("SELECT id FROM $trinitydb.creature_questrelation WHERE quest=" . $quest), 0);
+                      echo mysql_result(mysql_query("SELECT name FROM $trinitydb.creature_template WHERE entry=" . $creature_id), 0) . " (NPC) <a href=\"http://old.wowhead.com/npc=" . $creature_id . "\" target=_blank>Wowhead</a>";
+                  } else if (mysql_result(mysql_query("SELECT COUNT(id) FROM $trinitydb.gameobject_questrelation WHERE quest=" . $quest), 0) > 0)
+                      echo mysql_result(mysql_query("SELECT name FROM $trinitydb.gameobject_template WHERE entry=(SELECT id FROM $trinitydb.gameobject_questrelation WHERE quest=" . $quest . ")"), 0) . " (GO)";
+                  else if (mysql_result(mysql_query("SELECT COUNT(entry) FROM $trinitydb.item_template WHERE startquest=" . $quest), 0) > 0)
+                      echo mysql_result(mysql_query("SELECT name FROM $trinitydb.item_template WHERE startquest=" . $quest), 0) . " (Item)";
+                  else if (mysql_result(mysql_query("SELECT COUNT(id) FROM $trinitydb.game_event_creature_quest WHERE quest=" . $quest), 0) > 0) {
+                      $creature_id = mysql_result(mysql_query("SELECT id FROM $trinitydb.game_event_creature_quest WHERE quest=" . $quest), 0);
+                      echo mysql_result(mysql_query("SELECT name FROM $trinitydb.creature_template WHERE entry=" . $creature_id), 0) . " (NPC) during event " . mysql_result(mysql_query("SELECT description FROM $trinitydb.game_event WHERE entry=(SELECT event FROM $trinitydb.game_event_creature_quest WHERE quest=" . $quest . ")"), 0) . " <a href=\"http://old.wowhead.com/npc=" . $creature_id . "\" target=_blank>Wowhead</a>";
                   }
                   else
                       echo "---";
                   echo "</br>";
 
                   echo "<b>Quest End:</b> ";
-                  if (mysql_result(mysql_query("SELECT COUNT(id) FROM $mangosdb.creature_involvedrelation WHERE quest=" . $quest), 0) > 0) {
-                      $creature_id = mysql_result(mysql_query("SELECT id FROM $mangosdb.creature_involvedrelation WHERE quest=" . $quest), 0);
-                      echo mysql_result(mysql_query("SELECT name FROM $mangosdb.creature_template WHERE entry=" . $creature_id), 0) . " (NPC) <a href=\"http://old.wowhead.com/npc=" . $creature_id . "\" target=_blank>Wowhead</a>";
-                  } else if (mysql_result(mysql_query("SELECT COUNT(id) FROM $mangosdb.gameobject_involvedrelation WHERE quest=" . $quest), 0) > 0)
-                      echo mysql_result(mysql_query("SELECT name FROM $mangosdb.gameobject_template WHERE entry=(SELECT id FROM $mangosdb.gameobject_involvedrelation WHERE quest=" . $quest . ")"), 0) . " (GO)";
+                  if (mysql_result(mysql_query("SELECT COUNT(id) FROM $trinitydb.creature_involvedrelation WHERE quest=" . $quest), 0) > 0) {
+                      $creature_id = mysql_result(mysql_query("SELECT id FROM $trinitydb.creature_involvedrelation WHERE quest=" . $quest), 0);
+                      echo mysql_result(mysql_query("SELECT name FROM $trinitydb.creature_template WHERE entry=" . $creature_id), 0) . " (NPC) <a href=\"http://old.wowhead.com/npc=" . $creature_id . "\" target=_blank>Wowhead</a>";
+                  } else if (mysql_result(mysql_query("SELECT COUNT(id) FROM $trinitydb.gameobject_involvedrelation WHERE quest=" . $quest), 0) > 0)
+                      echo mysql_result(mysql_query("SELECT name FROM $trinitydb.gameobject_template WHERE entry=(SELECT id FROM $trinitydb.gameobject_involvedrelation WHERE quest=" . $quest . ")"), 0) . " (GO)";
                   else
                       echo "---";
                   echo "</br>";
@@ -831,7 +831,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                           $parent *= - 1;
                           $parent_active = true;
                       }
-                      echo "<b>Previous quest:</b> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $parent . ">" . mysql_result(mysql_query("SELECT Title FROM $mangosdb.quest_template WHERE entry=" . $parent), 0) . " (" . $parent . ")</a> " . ($parent_active ? "(must be active) " : "") .get_queststatus($parent) . "<br>";
+                      echo "<b>Previous quest:</b> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $parent . ">" . mysql_result(mysql_query("SELECT Title FROM $trinitydb.quest_template WHERE entry=" . $parent), 0) . " (" . $parent . ")</a> " . ($parent_active ? "(must be active) " : "") .get_queststatus($parent) . "<br>";
                   }
 
                   $next = $row["NextQuestId"];
@@ -841,16 +841,16 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                           $next *= - 1;
                           $subquest = true;
                       }
-                      echo "<b>Next quest:</b> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $next . ">" . mysql_result(mysql_query("SELECT Title FROM $mangosdb.quest_template WHERE entry=" . $next), 0) . " (" . $next . ")</a> " . ($subquest ? "(subquest) " : "").get_queststatus($next) . "<br>";
+                      echo "<b>Next quest:</b> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $next . ">" . mysql_result(mysql_query("SELECT Title FROM $trinitydb.quest_template WHERE entry=" . $next), 0) . " (" . $next . ")</a> " . ($subquest ? "(subquest) " : "").get_queststatus($next) . "<br>";
                   }
                   $chain = $row["NextQuestInChain"];
                   if ($chain != 0) {
-                      echo "<b>Quest Chain:</b> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $chain . ">" . mysql_result(mysql_query("SELECT Title FROM $mangosdb.quest_template WHERE entry=" . $chain), 0) . " (" . $chain . ")</a> ".get_queststatus($chain) . "<br>";
+                      echo "<b>Quest Chain:</b> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $chain . ">" . mysql_result(mysql_query("SELECT Title FROM $trinitydb.quest_template WHERE entry=" . $chain), 0) . " (" . $chain . ")</a> ".get_queststatus($chain) . "<br>";
                   }
-                  $others = mysql_result(mysql_query("SELECT Count(entry) FROM $mangosdb.quest_template WHERE PrevQuestId=$quest OR PrevQuestId=-$quest"), 0);
+                  $others = mysql_result(mysql_query("SELECT Count(entry) FROM $trinitydb.quest_template WHERE PrevQuestId=$quest OR PrevQuestId=-$quest"), 0);
                   if ($others > 0) {
                       echo "<b>Quests pointing to this:</b> <ul>";
-                      $sql = mysql_query("SELECT entry, Title FROM $mangosdb.quest_template WHERE PrevQuestId=$quest OR PrevQuestId=-$quest ORDER BY entry");
+                      $sql = mysql_query("SELECT entry, Title FROM $trinitydb.quest_template WHERE PrevQuestId=$quest OR PrevQuestId=-$quest ORDER BY entry");
                       while ($row2 = mysql_fetch_assoc($sql)) {
                           echo "<li><a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $row2["entry"] . ">" . $row2["Title"] . " (" . $row2["entry"] . ")</a> ".get_queststatus($row2["entry"])."</li>";
                       }
@@ -858,7 +858,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   }
                   $exclusivegroup = $row["ExclusiveGroup"];
                   if (!empty($exclusivegroup)) {
-                      $res = mysql_query("SELECT entry,Title FROM $mangosdb.quest_template WHERE ExclusiveGroup=$exclusivegroup");
+                      $res = mysql_query("SELECT entry,Title FROM $trinitydb.quest_template WHERE ExclusiveGroup=$exclusivegroup");
                       $temp = array();
                       while ($row2 = mysql_fetch_array($res)) {
                           $temp[] = "<a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $row2["entry"] . ">" . $row2["Title"] . " (" . $row2["entry"] . ")</a> ".get_queststatus($row2["entry"]);
@@ -920,7 +920,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   $temp = "";
                   for ($i = 1; $i <= 4; $i++) {
                       if (!empty($row["ReqCreatureOrGOId" . $i]) && !empty($row["ReqCreatureOrGOCount" . $i])) {
-                          $temp .= "<tr><td><b>" . ((empty($row["ReqSpellCast" . $i]) && $row["ReqCreatureOrGOId" . $i] > 0) ? "Kill " : "Use/Cast ") . ($row["ReqCreatureOrGOId" . $i] > 0 ? "Creature" : "Object") . ":</b> " . $row["ReqCreatureOrGOCount" . $i] . "x " . mysql_result(mysql_query("SELECT name FROM $mangosdb." . ($row["ReqCreatureOrGOId" . $i] > 0 ? "creature" : "gameobject") . "_template WHERE entry=" . ($row["ReqCreatureOrGOId" . $i] > 0 ? $row["ReqCreatureOrGOId" . $i] : -1 * $row["ReqCreatureOrGOId" . $i])), 0) . " " . (!empty($row["ObjectiveText" . $i]) ? "(=" . $row["ObjectiveText" . $i] . ")" : "") . "</td></tr>";
+                          $temp .= "<tr><td><b>" . ((empty($row["ReqSpellCast" . $i]) && $row["ReqCreatureOrGOId" . $i] > 0) ? "Kill " : "Use/Cast ") . ($row["ReqCreatureOrGOId" . $i] > 0 ? "Creature" : "Object") . ":</b> " . $row["ReqCreatureOrGOCount" . $i] . "x " . mysql_result(mysql_query("SELECT name FROM $trinitydb." . ($row["ReqCreatureOrGOId" . $i] > 0 ? "creature" : "gameobject") . "_template WHERE entry=" . ($row["ReqCreatureOrGOId" . $i] > 0 ? $row["ReqCreatureOrGOId" . $i] : -1 * $row["ReqCreatureOrGOId" . $i])), 0) . " " . (!empty($row["ObjectiveText" . $i]) ? "(=" . $row["ObjectiveText" . $i] . ")" : "") . "</td></tr>";
                       }
                       unset($row["ReqCreatureOrGOId" . $i], $row["ReqCreatureOrGOCount" . $i], $row["ObjectiveText" . $i]);
                   }
@@ -1050,7 +1050,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   if (isset($row["CharTitleId"]) && $row["CharTitleId"] > 0) //TBC
                       $temp.="<tr><td><b>Title:</b> " . mysql_result(mysql_query("SELECT name FROM $trackerdb.chartitles WHERE id=" . $row["CharTitleId"]), 0) . "</td></tr>";
                   if ($row["RewMailTemplateId"] > 0)
-                      $temp.="<tr><td><b>Item by Mail:</b> " . mysql_result(mysql_query("SELECT name FROM $mangosdb.item_template WHERE entry=(SELECT item FROM $mangosdb.quest_mail_loot_template WHERE entry=" . $quest . ")"), 0) . " after " . floor($row["RewMailDelaySecs"] / 60) . ":" . ($row["RewMailDelaySecs"] % 60 < 10 ? "0" : "") . ($row["RewMailDelaySecs"] % 60) . "</td></tr>";
+                      $temp.="<tr><td><b>Item by Mail:</b> " . mysql_result(mysql_query("SELECT name FROM $trinitydb.item_template WHERE entry=(SELECT item FROM $trinitydb.quest_mail_loot_template WHERE entry=" . $quest . ")"), 0) . " after " . floor($row["RewMailDelaySecs"] / 60) . ":" . ($row["RewMailDelaySecs"] % 60 < 10 ? "0" : "") . ($row["RewMailDelaySecs"] % 60) . "</td></tr>";
 
                   if (!empty($temp)) {
                       echo "<td valign=top><fieldset><legend>Other Rewards</legend><table cellspacing=2>";
