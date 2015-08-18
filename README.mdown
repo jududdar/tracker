@@ -63,7 +63,7 @@ You can configure various options inside the tracker from the administration men
 
 And if something goes wrong?
 ----------------------------
-... for now you will have to figure out on your own.  I'm probably still trying to figure it out myself  Of course, you are welcome to fork the
+... for now you will have to figure out on your own.  I'm probably still trying to figure it out myself.  Of course, you are welcome to fork the
 repository, and submit pull requests with your changes.
 
 _If_ you feel like submitting an issue, please do so *only* if you are willing
