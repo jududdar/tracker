@@ -678,7 +678,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                       $side_a = ($row["RequiredRaces"] == 0 || $row["RequiredRaces"] & 1101) ? "tag_alliance" : "tag_gray";
                       $side_h = ($row["RequiredRaces"] == 0 || $row["RequiredRaces"] & 690) ? "tag_horde" : "tag_gray";
 
-                      echo "<tr><td><a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $row["entry"] . ">" . $row["entry"] . "</a></td><td><span class=\"tag ".$side_a."\">A</span> <span class=\"tag ".$side_h."\">H</span> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $row["entry"] . ">" . $row["Title"] . "</a> [".$row["QuestLevel"]."] </td><td>" . get_queststatus($row["entry"],true) . "</td></tr>";
+                      echo "<tr><td><a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $row["ID"] . ">" . $row["ID"] . "</a></td><td><span class=\"tag ".$side_a."\">A</span> <span class=\"tag ".$side_h."\">H</span> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $row["ID"] . ">" . $row["LogTitle"] . "</a> [".$row["QuestLevel"]."] </td><td>" . get_queststatus($row["ID"],true) . "</td></tr>";
                   }
               }
 
@@ -740,18 +740,18 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                       echo mysql_result(mysql_query("SELECT name FROM $trinitydb.item_template WHERE startquest=" . $quest), 0) . " (Item)";
                   else if (mysql_result(mysql_query("SELECT COUNT(id) FROM $trinitydb.game_event_creature_quest WHERE quest=" . $quest), 0) > 0) {
                       $creature_id = mysql_result(mysql_query("SELECT id FROM $trinitydb.game_event_creature_quest WHERE quest=" . $quest), 0);
-                      echo mysql_result(mysql_query("SELECT name FROM $trinitydb.creature_template WHERE entry=" . $creature_id), 0) . " (NPC) during event " . mysql_result(mysql_query("SELECT description FROM $trinitydb.game_event WHERE entry=(SELECT event FROM $trinitydb.game_event_creature_quest WHERE quest=" . $quest . ")"), 0) . " <a href=\"http://old.wowhead.com/npc=" . $creature_id . "\" target=_blank>Wowhead</a>";
+                      echo mysql_result(mysql_query("SELECT name FROM $trinitydb.creature_template WHERE entry=" . $creature_id), 0) . " (NPC) during event " . mysql_result(mysql_query("SELECT description FROM $trinitydb.game_event WHERE eventEntry=(SELECT eventEntry FROM $trinitydb.game_event_creature_quest WHERE quest=" . $quest . ")"), 0) . " <a href=\"http://old.wowhead.com/npc=" . $creature_id . "\" target=_blank>Wowhead</a>";
                   }
                   else
                       echo "---";
                   echo "</br>";
 
                   echo "<b>Quest End:</b> ";
-                  if (mysql_result(mysql_query("SELECT COUNT(id) FROM $trinitydb.creature_involvedrelation WHERE quest=" . $quest), 0) > 0) {
-                      $creature_id = mysql_result(mysql_query("SELECT id FROM $trinitydb.creature_involvedrelation WHERE quest=" . $quest), 0);
+                  if (mysql_result(mysql_query("SELECT COUNT(id) FROM $trinitydb.creature_questender WHERE quest=" . $quest), 0) > 0) {
+                      $creature_id = mysql_result(mysql_query("SELECT id FROM $trinitydb.creature_questender WHERE quest=" . $quest), 0);
                       echo mysql_result(mysql_query("SELECT name FROM $trinitydb.creature_template WHERE entry=" . $creature_id), 0) . " (NPC) <a href=\"http://old.wowhead.com/npc=" . $creature_id . "\" target=_blank>Wowhead</a>";
-                  } else if (mysql_result(mysql_query("SELECT COUNT(id) FROM $trinitydb.gameobject_involvedrelation WHERE quest=" . $quest), 0) > 0)
-                      echo mysql_result(mysql_query("SELECT name FROM $trinitydb.gameobject_template WHERE entry=(SELECT id FROM $trinitydb.gameobject_involvedrelation WHERE quest=" . $quest . ")"), 0) . " (GO)";
+                  } else if (mysql_result(mysql_query("SELECT COUNT(id) FROM $trinitydb.gameobject_questender WHERE quest=" . $quest), 0) > 0)
+                      echo mysql_result(mysql_query("SELECT name FROM $trinitydb.gameobject_template WHERE entry=(SELECT id FROM $trinitydb.gameobject_questender WHERE quest=" . $quest . ")"), 0) . " (GO)";
                   else
                       echo "---";
                   echo "</br>";
@@ -831,7 +831,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                           $parent *= - 1;
                           $parent_active = true;
                       }
-                      echo "<b>Previous quest:</b> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $parent . ">" . mysql_result(mysql_query("SELECT Title FROM $trinitydb.quest_template WHERE entry=" . $parent), 0) . " (" . $parent . ")</a> " . ($parent_active ? "(must be active) " : "") .get_queststatus($parent) . "<br>";
+                      echo "<b>Previous quest:</b> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $parent . ">" . mysql_result(mysql_query("SELECT LogTitle FROM $trinitydb.quest_template WHERE ID=" . $parent), 0) . " (" . $parent . ")</a> " . ($parent_active ? "(must be active) " : "") .get_queststatus($parent) . "<br>";
                   }
 
                   $next = $row["NextQuestId"];
@@ -841,13 +841,13 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                           $next *= - 1;
                           $subquest = true;
                       }
-                      echo "<b>Next quest:</b> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $next . ">" . mysql_result(mysql_query("SELECT Title FROM $trinitydb.quest_template WHERE entry=" . $next), 0) . " (" . $next . ")</a> " . ($subquest ? "(subquest) " : "").get_queststatus($next) . "<br>";
+                      echo "<b>Next quest:</b> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $next . ">" . mysql_result(mysql_query("SELECT LogTitle FROM $trinitydb.quest_template WHERE ID=" . $next), 0) . " (" . $next . ")</a> " . ($subquest ? "(subquest) " : "").get_queststatus($next) . "<br>";
                   }
                   $chain = $row["NextQuestInChain"];
                   if ($chain != 0) {
-                      echo "<b>Quest Chain:</b> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $chain . ">" . mysql_result(mysql_query("SELECT Title FROM $trinitydb.quest_template WHERE entry=" . $chain), 0) . " (" . $chain . ")</a> ".get_queststatus($chain) . "<br>";
+                      echo "<b>Quest Chain:</b> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $chain . ">" . mysql_result(mysql_query("SELECT LogTitle FROM $trinitydb.quest_template WHERE ID=" . $chain), 0) . " (" . $chain . ")</a> ".get_queststatus($chain) . "<br>";
                   }
-                  $others = mysql_result(mysql_query("SELECT Count(entry) FROM $trinitydb.quest_template WHERE PrevQuestId=$quest OR PrevQuestId=-$quest"), 0);
+                  $others = mysql_result(mysql_query("SELECT Count(ID) FROM $trinitydb.quest_template WHERE PrevQuestId=$quest OR PrevQuestId=-$quest"), 0);
                   if ($others > 0) {
                       echo "<b>Quests pointing to this:</b> <ul>";
                       $sql = mysql_query("SELECT entry, Title FROM $trinitydb.quest_template WHERE PrevQuestId=$quest OR PrevQuestId=-$quest ORDER BY entry");
@@ -858,7 +858,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   }
                   $exclusivegroup = $row["ExclusiveGroup"];
                   if (!empty($exclusivegroup)) {
-                      $res = mysql_query("SELECT entry,Title FROM $trinitydb.quest_template WHERE ExclusiveGroup=$exclusivegroup");
+                      $res = mysql_query("SELECT ID,LogTitle FROM $trinitydb.quest_template WHERE SuggestedGroupNum=$exclusivegroup");
                       $temp = array();
                       while ($row2 = mysql_fetch_array($res)) {
                           $temp[] = "<a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $row2["entry"] . ">" . $row2["Title"] . " (" . $row2["entry"] . ")</a> ".get_queststatus($row2["entry"]);
@@ -920,7 +920,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   $temp = "";
                   for ($i = 1; $i <= 4; $i++) {
                       if (!empty($row["ReqCreatureOrGOId" . $i]) && !empty($row["ReqCreatureOrGOCount" . $i])) {
-                          $temp .= "<tr><td><b>" . ((empty($row["ReqSpellCast" . $i]) && $row["ReqCreatureOrGOId" . $i] > 0) ? "Kill " : "Use/Cast ") . ($row["ReqCreatureOrGOId" . $i] > 0 ? "Creature" : "Object") . ":</b> " . $row["ReqCreatureOrGOCount" . $i] . "x " . mysql_result(mysql_query("SELECT name FROM $trinitydb." . ($row["ReqCreatureOrGOId" . $i] > 0 ? "creature" : "gameobject") . "_template WHERE entry=" . ($row["ReqCreatureOrGOId" . $i] > 0 ? $row["ReqCreatureOrGOId" . $i] : -1 * $row["ReqCreatureOrGOId" . $i])), 0) . " " . (!empty($row["ObjectiveText" . $i]) ? "(=" . $row["ObjectiveText" . $i] . ")" : "") . "</td></tr>";
+                          $temp .= "<tr><td><b>" . ((empty($row["ReqSpellCast" . $i]) && $row["ReqCreatureOrGOId" . $i] > 0) ? "Kill " : "Use/Cast ") . ($row["ReqCreatureOrGOId" . $i] > 0 ? "Creature" : "Object") . ":</b> " . $row["ReqCreatureOrGOCount" . $i] . "x " . mysql_result(mysql_query("SELECT name FROM $trinitydb." . ($row["ReqCreatureOrGOId" . $i] > 0 ? "creature" : "gameobject") . "_template WHERE ID=" . ($row["ReqCreatureOrGOId" . $i] > 0 ? $row["ReqCreatureOrGOId" . $i] : -1 * $row["ReqCreatureOrGOId" . $i])), 0) . " " . (!empty($row["ObjectiveText" . $i]) ? "(=" . $row["ObjectiveText" . $i] . ")" : "") . "</td></tr>";
                       }
                       unset($row["ReqCreatureOrGOId" . $i], $row["ReqCreatureOrGOCount" . $i], $row["ObjectiveText" . $i]);
                   }
