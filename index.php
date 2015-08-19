@@ -257,7 +257,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
 <html>
     <head>
         <title><?php echo $title;?> - <?php echo mysql_result(mysql_query("SELECT db_version FROM $trinitydb.version"), 0); ?></title>
-        <script type="text/javascript" src="http://static.wowhead.com/widgets/power.js"></script>
+        <script type="text/javascript" src="http://cdn.openwow.com/api/tooltip.js"></script>
         <style>
             body, td, div { font-family:Helvetica,Arial,sans-serif; font-size:12px;}
             ul,li{margin:2px}
@@ -399,13 +399,13 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                           echo "<tr><td>Quest ID</td><td>Name</td><td>Reported Status</td></tr>";
                           $sql = mysql_query("SELECT ID, LogTitle FROM $trinitydb.quest_template WHERE ID = " . mysql_real_escape_string($query));
                           while ($row = mysql_fetch_assoc($sql)) {
-                              $res2 = mysql_query("SELECT status, dbver FROM $trackerdb.status WHERE quest_id = " . $row["entry"] . " AND dbver>=" . $c_database_version . " GROUP BY status ASC, dbver DESC");
+                              $res2 = mysql_query("SELECT status, dbver FROM $trackerdb.status WHERE quest_id = " . $row["ID"] . " AND dbver>=" . $c_database_version . " GROUP BY status ASC, dbver DESC");
                               $queststatus = "";
                               while ($row2 = mysql_fetch_array($res2))
                                   $queststatus.="<span class=\"tag tag" . $row2["status"] . "\" title=\"" . $status[$row2["status"]] . "\">" . $database_version[$row2["dbver"]] . "</span> ";
                               if (empty($queststatus))
                                   $queststatus = $status[0] . " in " . $database_version[0];
-                              echo "<tr><td><a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $row["entry"] . ">" . $row["entry"] . "</a></td><td><a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $row["entry"] . ">" . $row["Title"] . "</a></td><td>" . $queststatus . "</td></tr>";
+                              echo "<tr><td><a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $row["ID"] . ">" . $row["ID"] . "</a></td><td><a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $row["ID"] . ">" . $row["LogTitle"] . "</a></td><td>" . $queststatus . "</td></tr>";
                           }
                       }
                   }
@@ -443,7 +443,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   $count = mysql_result(mysql_query("SELECT COUNT(entry) FROM $trackerdb.problems WHERE entry NOT IN (SELECT quest_id FROM $trackerdb.status)"), 0);
                   echo "Obvious Problems ($count problems detected)</td><td class=login colspan=2>$login</td></tr>";
                   echo "<tr><td colspan=4>This page lists all quests that have issues which can be detected automatically but need to be diagnosed manually (you understand the dilemma, don't you?) and have not been looked at yet.<br>
-                        List of detectable problems (Please post ideas at the UDB Forums!!):<ul>";
+                        List of detectable problems:<ul>";
                   for ($i = 1; $i < count($problems); $i++)
                       echo "<li>" . $problems[$i] . "</li>";
                   echo "</td></tr>";
@@ -814,7 +814,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   if ($row_addon["SpecialFlags"] > 0) {
                       echo "<b>Special Flags:</b> ";
                       for ($i = 0; $i <= 2; $i++)
-                          if ($row["SpecialFlags"] & 1 << $i)
+                          if ($row_addon["SpecialFlags"] & 1 << $i)
                               echo (1 << $i) . "=" . $special_flags[$i + 1] . "; ";
                       echo "</br>";
                   }
@@ -848,7 +848,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   if ($chain != 0) {
                       echo "<b>Quest Chain:</b> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $chain . ">" . mysql_result(mysql_query("SELECT LogTitle FROM $trinitydb.quest_template WHERE ID=" . $chain), 0) . " (" . $chain . ")</a> ".get_queststatus($chain) . "<br>";
                   }
-                  $others = mysql_result(mysql_query("SELECT Count(ID) FROM $trinitydb.quest_template WHERE PrevQuestId=$quest OR PrevQuestId=-$quest"), 0);
+                  $others = mysql_result(mysql_query("SELECT Count(ID) FROM $trinitydb.quest_template_addon WHERE PrevQuestId=$quest OR PrevQuestId=-$quest"), 0);
                   if ($others > 0) {
                       echo "<b>Quests pointing to this:</b> <ul>";
                       $sql = mysql_query("SELECT entry, Title FROM $trinitydb.quest_template WHERE PrevQuestId=$quest OR PrevQuestId=-$quest ORDER BY entry");
