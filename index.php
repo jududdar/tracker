@@ -427,7 +427,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                               $queststatus = "";
                               while ($row2 = mysql_fetch_array($res2))
                                   $queststatus.="<span class=\"tag tag" . $row2["status"] . "\" title=\"" . $status[$row2["status"]] . "\">" . $database_version[$row2["dbver"]] . "</span> ";
-                              echo "<tr><td><a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $row["entry"] . ">" . $row["entry"] . "</a></td><td><a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $row["entry"] . ">" . $row["Title"] . "</a></td><td>" . $queststatus . "</td></tr>";
+                              echo "<tr><td><a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $row["ID"] . ">" . $row["ID"] . "</a></td><td><a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $row["ID"] . ">" . $row["LogTitle"] . "</a></td><td>" . $queststatus . "</td></tr>";
                           }
                       }
                   }
@@ -689,6 +689,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                 */
               elseif (is_numeric($quest)) {
                   $row = mysql_fetch_assoc(mysql_query("SELECT * FROM $trinitydb.quest_template WHERE ID = $quest"));
+                  $row_addon = mysql_fetch_assoc(mysql_query("SELECT * FROM $trinitydb.quest_template_addon WHERE ID = $quest"));
 
                   //We must backcalculate the breadcrumbs
                   $areasort = $row["QuestSortID"];
@@ -713,34 +714,34 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                       $mapname = mysql_result(mysql_query("SELECT a.name FROM $trackerdb.questsort as a WHERE a.id=-1*$areasort"), 0);
                       echo "<a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&areasort=$areasort>$mapname</a>&nbsp;>>&nbsp;";
                   }
-                  echo "Quest " . $quest . " - " . $row["Title"] . "</td><td class=login>$login</td></tr>";
+                  echo "Quest " . $quest . " - " . $row["LogTitle"] . "</td><td class=login>$login</td></tr>";
                   //end breadcrumbs
 
                   echo "<tr><td colspan=3>";
 
                   echo "<fieldset><legend>General Information</legend>";
 
-                  echo "<b>Quest ID:</b> " . $row["entry"] . "</br>";
+                  echo "<b>Quest ID:</b> " . $row["ID"] . "</br>";
 
-                  echo "<b>Title:</b> <a href=\"http://old.wowhead.com/quest=" . $row["entry"] . "\" target=_blank>" . htmlentities($row["Title"]) . "</a></br>";
+                  echo "<b>Title:</b> <a href=\"http://wotlk.openwow.com/quest=" . $row["ID"] . "\" target=_blank>" . htmlentities($row["LogTitle"]) . "</a></br>";
 
-                  $questtype = $row["Type"] == 0 ? "none" : mysql_result(mysql_query("SELECT name FROM $trackerdb.questinfo WHERE id=" . $row["Type"]), 0);
+                  $questtype = $row["QuestType"] == 0 ? "none" : mysql_result(mysql_query("SELECT name FROM $trackerdb.questinfo WHERE id=" . $row["QuestType"]), 0);
                   echo "<b>Quest Type:</b> " . $questtype . "</br>";
 
-                  if ($row["SuggestedPlayers"] > 0)
-                      echo "Suggested Players: " . $row["SuggestedPlayers"] . "</br>";
+                  if ($row["SuggestedGroupNum"] > 0)
+                      echo "Suggested Players: " . $row["SuggestedGroupNum"] . "</br>";
 
                   echo "<b>Quest Start:</b> ";
                   if (mysql_result(mysql_query("SELECT COUNT(id) FROM $trinitydb.creature_queststarter WHERE quest=" . $quest), 0) > 0) {
                       $creature_id = mysql_result(mysql_query("SELECT id FROM $trinitydb.creature_queststarter WHERE quest=" . $quest), 0);
-                      echo mysql_result(mysql_query("SELECT name FROM $trinitydb.creature_template WHERE entry=" . $creature_id), 0) . " (NPC) <a href=\"http://old.wowhead.com/npc=" . $creature_id . "\" target=_blank>Wowhead</a>";
+                      echo mysql_result(mysql_query("SELECT name FROM $trinitydb.creature_template WHERE entry=" . $creature_id), 0) . " (NPC) <a href=\"http://wotlk.openwow.com/npc=" . $creature_id . "\" target=_blank>Wowhead</a>";
                   } else if (mysql_result(mysql_query("SELECT COUNT(id) FROM $trinitydb.gameobject_queststarter WHERE quest=" . $quest), 0) > 0)
                       echo mysql_result(mysql_query("SELECT name FROM $trinitydb.gameobject_template WHERE entry=(SELECT id FROM $trinitydb.gameobject_queststarter WHERE quest=" . $quest . ")"), 0) . " (GO)";
                   else if (mysql_result(mysql_query("SELECT COUNT(entry) FROM $trinitydb.item_template WHERE startquest=" . $quest), 0) > 0)
                       echo mysql_result(mysql_query("SELECT name FROM $trinitydb.item_template WHERE startquest=" . $quest), 0) . " (Item)";
                   else if (mysql_result(mysql_query("SELECT COUNT(id) FROM $trinitydb.game_event_creature_quest WHERE quest=" . $quest), 0) > 0) {
                       $creature_id = mysql_result(mysql_query("SELECT id FROM $trinitydb.game_event_creature_quest WHERE quest=" . $quest), 0);
-                      echo mysql_result(mysql_query("SELECT name FROM $trinitydb.creature_template WHERE entry=" . $creature_id), 0) . " (NPC) during event " . mysql_result(mysql_query("SELECT description FROM $trinitydb.game_event WHERE eventEntry=(SELECT eventEntry FROM $trinitydb.game_event_creature_quest WHERE quest=" . $quest . ")"), 0) . " <a href=\"http://old.wowhead.com/npc=" . $creature_id . "\" target=_blank>Wowhead</a>";
+                      echo mysql_result(mysql_query("SELECT name FROM $trinitydb.creature_template WHERE entry=" . $creature_id), 0) . " (NPC) during event " . mysql_result(mysql_query("SELECT description FROM $trinitydb.game_event WHERE eventEntry=(SELECT eventEntry FROM $trinitydb.game_event_creature_quest WHERE quest=" . $quest . ")"), 0) . " <a href=\"http://wotlk.openwow.com/npc=" . $creature_id . "\" target=_blank>Wowhead</a>";
                   }
                   else
                       echo "---";
@@ -749,7 +750,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   echo "<b>Quest End:</b> ";
                   if (mysql_result(mysql_query("SELECT COUNT(id) FROM $trinitydb.creature_questender WHERE quest=" . $quest), 0) > 0) {
                       $creature_id = mysql_result(mysql_query("SELECT id FROM $trinitydb.creature_questender WHERE quest=" . $quest), 0);
-                      echo mysql_result(mysql_query("SELECT name FROM $trinitydb.creature_template WHERE entry=" . $creature_id), 0) . " (NPC) <a href=\"http://old.wowhead.com/npc=" . $creature_id . "\" target=_blank>Wowhead</a>";
+                      echo mysql_result(mysql_query("SELECT name FROM $trinitydb.creature_template WHERE entry=" . $creature_id), 0) . " (NPC) <a href=\"http://wotlk.openwow.com/npc=" . $creature_id . "\" target=_blank>Wowhead</a>";
                   } else if (mysql_result(mysql_query("SELECT COUNT(id) FROM $trinitydb.gameobject_questender WHERE quest=" . $quest), 0) > 0)
                       echo mysql_result(mysql_query("SELECT name FROM $trinitydb.gameobject_template WHERE entry=(SELECT id FROM $trinitydb.gameobject_questender WHERE quest=" . $quest . ")"), 0) . " (GO)";
                   else
@@ -766,12 +767,12 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
 
                   echo "<b>Quest Level:</b> " . $row["QuestLevel"] . "</br>";
 
-                  if ($row["RequiredSkill"] > 0) {
+                  if ($row_addon["RequiredSkillID"] > 0) {
                       $skill = mysql_result(mysql_query("SELECT name FROM $trackerdb.skillline WHERE id=" . $row["RequiredSkill"]), 0);
                       echo "<b>Required Skill:</b> " . $skill . " " . $row["RequiredSkillValue"] . "</br>";
                   }
 
-                  if ($row["RequiredClasses"] > 0) {
+                  if ($row_addon["AllowableClasses"] > 0) {
                       $class = mysql_result(mysql_query("SELECT name FROM $trackerdb.chrclasses WHERE id=" . $row["RequiredClasses"]), 0);
                       echo "<b>Required Class:</b> " . $class . "</br>";
                   }
@@ -792,7 +793,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   }
                   echo "</br>";
 
-                  if ($row["RequiredMinRepFaction"] or $row["RequiredMaxRepFaction"]) {
+                  if ($row_addon["RequiredMinRepFaction"] or $row_addon["RequiredMaxRepFaction"]) {
                       echo "<b>Required Faction Popularity:</b> ";
                       if ($row["RequiredMinRepFaction"])
                           echo mysql_result(mysql_query("SELECT name FROM $trackerdb.faction WHERE id=" . $row["RequiredMinRepFaction"]), 0) . " > " . $row["RequiredMinRepValue"] . "; ";
@@ -801,16 +802,16 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                       echo "</br>";
                   }
 
-                  if ($row["QuestFlags"] > 0) {
+                  if ($row["Flags"] > 0) {
                       echo "<b>Quest Flags:</b> ";
                       for ($i = 0; $i <= 15; $i++)
-                          if ($row["QuestFlags"] & 1 << $i)
+                          if ($row["Flags"] & 1 << $i)
                               echo (1 << $i) . "=" . $quest_flags[$i + 1] . "; ";
                       echo "</br>";
                   }
 
 
-                  if ($row["SpecialFlags"] > 0) {
+                  if ($row_addon["SpecialFlags"] > 0) {
                       echo "<b>Special Flags:</b> ";
                       for ($i = 0; $i <= 2; $i++)
                           if ($row["SpecialFlags"] & 1 << $i)
@@ -824,7 +825,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
 
                   echo "<fieldset><legend>Connected Quests</legend>";
 
-                  $parent = $row["PrevQuestId"];
+                  $parent = $row_addon["PrevQuestID"];
                   if ($parent != 0) {
                       $parent_active = false;
                       if ($parent < 0) {
@@ -834,7 +835,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                       echo "<b>Previous quest:</b> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $parent . ">" . mysql_result(mysql_query("SELECT LogTitle FROM $trinitydb.quest_template WHERE ID=" . $parent), 0) . " (" . $parent . ")</a> " . ($parent_active ? "(must be active) " : "") .get_queststatus($parent) . "<br>";
                   }
 
-                  $next = $row["NextQuestId"];
+                  $next = $row_addon["NextQuestID"];
                   if ($next != 0) {
                       $subquest = false;
                       if ($next < 0) {
@@ -843,7 +844,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                       }
                       echo "<b>Next quest:</b> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $next . ">" . mysql_result(mysql_query("SELECT LogTitle FROM $trinitydb.quest_template WHERE ID=" . $next), 0) . " (" . $next . ")</a> " . ($subquest ? "(subquest) " : "").get_queststatus($next) . "<br>";
                   }
-                  $chain = $row["NextQuestInChain"];
+                  $chain = $row["NextQuestIdChain"];
                   if ($chain != 0) {
                       echo "<b>Quest Chain:</b> <a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&quest=" . $chain . ">" . mysql_result(mysql_query("SELECT LogTitle FROM $trinitydb.quest_template WHERE ID=" . $chain), 0) . " (" . $chain . ")</a> ".get_queststatus($chain) . "<br>";
                   }
@@ -856,7 +857,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                       }
                       echo "</ul>";
                   }
-                  $exclusivegroup = $row["ExclusiveGroup"];
+                  $exclusivegroup = $row_addon["ExclusiveGroup"];
                   if (!empty($exclusivegroup)) {
                       $res = mysql_query("SELECT ID,LogTitle FROM $trinitydb.quest_template WHERE SuggestedGroupNum=$exclusivegroup");
                       $temp = array();
@@ -874,9 +875,9 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
 
                   //On Quest Start
                   $temp = "";
-                  if ($row["SrcItemId"] > 0 && $row["SrcItemCount"] > 0)
-                      $temp.="<tr><td><b>Provided Item:</b> " . $row["SrcItemCount"] . "x <a href=\"http://old.wowhead.com/item=" .$row["SrcItemId"] . "\" target=_blank>" . id2name("item_template", $row["SrcItemId"]). "</td></tr>";
-                  if ($row["SrcSpell"] > 0)
+                  if ($row["SourceItemId"] > 0 && $row["SrcItemCount"] > 0)
+                      $temp.="<tr><td><b>Provided Item:</b> " . $row["SrcItemCount"] . "x <a href=\"http://wotlk.openwow.com/item=" .$row["SrcItemId"] . "\" target=_blank>" . id2name("item_template", $row["SrcItemId"]). "</td></tr>";
+                  if ($row_addon["SourceSpellID"] > 0)
                       $temp.="<tr><td><b>Spell:</b> " . mysql_result(mysql_query("SELECT name FROM $trackerdb.spell WHERE id=" . $row["SrcSpell"]), 0) . "</td></tr>";
                   if (!empty($temp)) {
                       echo "<fieldset><legend>On Quest Start</legend><table cellspacing=2>";
@@ -895,8 +896,8 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                       echo "<p style=\"text-indent:-6em;margin-left:6em\"><b>Completion text:</b> <i>" . str_ireplace(array("\$b", "\$n", "\$r", "\$c", "\$g"), array("</br>", "&lt;Name&gt;", "&lt;Race&gt;", "&lt;Class&gt;", "&lt;Custom&gt;"), $row["OfferRewardText"]) . "</i></p>";
                   if (!empty($row["EndText"]))
                       echo "<p style=\"text-indent:-6em;margin-left:6em\"><b>End Text:</b> <i>" . str_ireplace(array("\$b", "\$n", "\$r", "\$c", "\$g"), array("</br>", "&lt;Name&gt;", "&lt;Race&gt;", "&lt;Class&gt;", "&lt;Custom&gt;"), $row["EndText"]) . "</i></p>";
-                  if (!empty($row["CompletedText"]))
-                      echo "<p style=\"text-indent:-6em;margin-left:6em\"><b>Completed Text:</b> <i>" . str_ireplace(array("\$b", "\$n", "\$r", "\$c", "\$g"), array("</br>", "&lt;Name&gt;", "&lt;Race&gt;", "&lt;Class&gt;", "&lt;Custom&gt;"), $row["CompletedText"]) . "</i></p>";
+                  if (!empty($row["QuestCompletionLog"]))
+                      echo "<p style=\"text-indent:-6em;margin-left:6em\"><b>Completed Text:</b> <i>" . str_ireplace(array("\$b", "\$n", "\$r", "\$c", "\$g"), array("</br>", "&lt;Name&gt;", "&lt;Race&gt;", "&lt;Class&gt;", "&lt;Custom&gt;"), $row["QuestCompletionLog"]) . "</i></p>";
                   echo "</fieldset>";
 
                   //Objectives
@@ -906,7 +907,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   $temp = "";
                   for ($i = 1; $i <= 6; $i++) {
                       if (!empty($row["ReqItemId" . $i]) && !empty($row["ReqItemCount" . $i])) {
-                          $temp.="<tr><td>" . $row["ReqItemCount" . $i] . "x <a href=\"http://old.wowhead.com/item=" . $row["ReqItemId". $i] . "\" target=_blank>" . id2name("item_template", $row["ReqItemId" . $i]) . "</a></td></tr>";
+                          $temp.="<tr><td>" . $row["ReqItemCount" . $i] . "x <a href=\"http://wotlk.openwow.com/item=" . $row["ReqItemId". $i] . "\" target=_blank>" . id2name("item_template", $row["ReqItemId" . $i]) . "</a></td></tr>";
                       }
                       unset($row["ReqItemCount" . $i], $row["ReqItemId" . $i]);
                   }
@@ -933,7 +934,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   $temp = "";
                   for ($i = 1; $i <= 4; $i++) {
                       if (!empty($row["ReqSourceId" . $i])) {
-                          $temp .= "<tr><td>" . ($row["ReqSourceCount" . $i] > 0 ? $row["ReqSourceCount" . $i] . "x " : "unlimited ") . "<a href=\"http://old.wowhead.com/item=" . $row["ReqSourceId". $i] . "\" target=_blank>" . id2name("item_template",$row["ReqSourceId" . $i]) . "</a></td></tr>";
+                          $temp .= "<tr><td>" . ($row["ReqSourceCount" . $i] > 0 ? $row["ReqSourceCount" . $i] . "x " : "unlimited ") . "<a href=\"http://wotlk.openwow.com/item=" . $row["ReqSourceId". $i] . "\" target=_blank>" . id2name("item_template",$row["ReqSourceId" . $i]) . "</a></td></tr>";
                       }
                       unset($row["ReqSourceId" . $i], $row["ReqSourceCount" . $i]);
                   }
@@ -960,10 +961,10 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   $temp = "";
                   if ($row["LimitTime"] > 0)
                       $temp.="<tr><td><b>Time Limit:</b> " . floor($row["LimitTime"] / 60) . ":" . ($row["LimitTime"] % 60 < 10 ? "0" : "") . ($row["LimitTime"] % 60) . "</td></tr>";
-                  if ($row["RewOrReqMoney"] < 0)
-                      $temp.="<tr><td><b>Money:</b> " . (-$row["RewOrReqMoney"] >= 10000 ? floor(-$row["RewOrReqMoney"] / 10000) . "g" : "")
-                              . ((-$row["RewOrReqMoney"] % 10000) >= 100 ? floor((-$row["RewOrReqMoney"] % 10000) / 100) . "s" : "")
-                              . ((-$row["RewOrReqMoney"] % 100) > 0 ? ((-$row["RewOrReqMoney"] % 100) . "c") : "")
+                  if ($row["RewardOrRequiredMoney"] < 0)
+                      $temp.="<tr><td><b>Money:</b> " . (-$row["RewardOrRequiredMoney"] >= 10000 ? floor(-$row["RewardOrRequiredMoney"] / 10000) . "g" : "")
+                              . ((-$row["RewardOrRequiredMoney"] % 10000) >= 100 ? floor((-$row["RewardOrRequiredMoney"] % 10000) / 100) . "s" : "")
+                              . ((-$row["RewardOrRequiredMoney"] % 100) > 0 ? ((-$row["RewardOrRequiredMoney"] % 100) . "c") : "")
                               . "</td></tr>";
                   if ($row["RepObjectiveFaction"] > 0 && $row["RepObjectiveValue"] > 0)
                       $temp.="<tr><td><b>Gain Reputation:</b> " . mysql_result(mysql_query("SELECT name FROM $trackerdb.faction WHERE id=" . $row["RepObjectiveFaction"]), 0) . " => " . $row["RepObjectiveValue"] . "</td></tr>";
@@ -987,16 +988,16 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   //Reward Reputation
                   $temp = "";
                   for ($i = 1; $i <= 5; $i++) {
-                      if (!empty($row["RewRepFaction" . $i]) && (!empty($row["RewRepValue" . $i]) || !empty($row["RewRepValueId" . $i]) )) {
-                          $temp.="<tr><td>" . mysql_result(mysql_query("SELECT name FROM $trackerdb.faction WHERE id=" . $row["RewRepFaction" . $i]), 0) . ": ";
-                          $temp .= ( $row["RewRepValue" . $i] ? $row["RewRepValue" . $i] : "");
-                          if(isset($row["RewRepValueId" . $i])) //WoTLK
+                      if (!empty($row["RewardFactionID" . $i]) && (!empty($row["RewardFactionValue" . $i]) || !empty($row["RewardFactionOverride" . $i]) )) {
+                          $temp.="<tr><td>" . mysql_result(mysql_query("SELECT name FROM $trackerdb.faction WHERE id=" . $row["RewardFactionID" . $i]), 0) . ": ";
+                          $temp .= ( $row["RewardFactionValue" . $i] ? $row["RewardFactionValue" . $i] : "");
+                          if(isset($row["RewardFactionOverride" . $i])) //WoTLK
                           {
-                              $temp .= ( ($row["RewRepValue" . $i] && $row["RewRepValueId" . $i]) ? " / " : "");
-                              $temp .= ( $row["RewRepValueId" . $i] ? "<b>ID:</b> " . $row["RewRepValueId" . $i] : "") . "</td></tr>";
+                              $temp .= ( ($row["RewardFactionValue" . $i] && $row["RewardFactionOverride" . $i]) ? " / " : "");
+                              $temp .= ( $row["RewardFactionOverride" . $i] ? "<b>ID:</b> " . $row["RewardFactionOverride" . $i] : "") . "</td></tr>";
                           }
                       }
-                      unset($row["RewRepFaction" . $i], $row["RewRepValue" . $i], $row["RewRepValueId" . $i]);
+                      unset($row["RewardFactionID" . $i], $row["RewardFactionValue" . $i], $row["RewardFactionOverride" . $i]);
                   }
                   if (!empty($temp)) {
                       echo "<td valign=top><fieldset><legend>Reputation reward</legend><table cellspacing=2>";
@@ -1007,10 +1008,10 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   //Reward Choice
                   $temp = "";
                   for ($i = 1; $i <= 6; $i++) {
-                      if (!empty($row["RewChoiceItemId" . $i]) && !empty($row["RewChoiceItemCount" . $i])) {
-                          $temp.="<tr><td>" . $row["RewChoiceItemCount" . $i] . "x <a href=\"http://old.wowhead.com/item=". $row["RewChoiceItemId" . $i] . "\" target=_blank>" . id2name("item_template", $row["RewChoiceItemId" . $i]) . "</td></tr>";
+                      if (!empty($row["RewardChoiceItemID" . $i]) && !empty($row["RewardChoiceItemQuantity" . $i])) {
+                          $temp.="<tr><td>" . $row["RewardChoiceItemQuantity" . $i] . "x <a href=\"http://wotlk.openwow.com/item=". $row["RewardChoiceItemID" . $i] . "\" target=_blank>" . id2name("item_template", $row["RewardChoiceItemID" . $i]) . "</td></tr>";
                       }
-                      unset($row["RewChoiceItemCount" . $i], $row["RewChoiceItemId" . $i]);
+                      unset($row["RewardChoiceItemQuantity" . $i], $row["ReardChoiceItemID" . $i]);
                   }
                   if (!empty($temp)) {
                       echo "<td valign=top><fieldset><legend>Item Choice</legend><table cellspacing=2>";
@@ -1021,10 +1022,10 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   //Reward Item
                   $temp = "";
                   for ($i = 1; $i <= 4; $i++) {
-                      if (!empty($row["RewItemId" . $i]) && !empty($row["RewItemCount" . $i])) {
-                          $temp.="<tr><td>" . $row["RewItemCount" . $i] . "x <a href=\"http://old.wowhead.com/item=". $row["RewItemId" . $i] . "\" target=_blank>" . id2name("item_template", $row["RewItemId" . $i]) . "</td></tr>";
+                      if (!empty($row["RewardItem" . $i]) && !empty($row["RewardAmount" . $i])) {
+                          $temp.="<tr><td>" . $row["RewardAmount" . $i] . "x <a href=\"http://wotlk.openwow.com/item=". $row["RewardItem" . $i] . "\" target=_blank>" . id2name("item_template", $row["RewardItem" . $i]) . "</td></tr>";
                       }
-                      unset($row["RewItemCount" . $i], $row["RewItemId" . $i]);
+                      unset($row["RewardAmount" . $i], $row["RewardItem" . $i]);
                   }
                   if (!empty($temp)) {
                       echo "<td valign=top><fieldset><legend>Item Reward</legend><table cellspacing=2>";
@@ -1034,22 +1035,22 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
 
                   //Reward Other
                   $temp = "";
-                  if ($row["RewMoneyMaxLevel"] > 0)
-                      $temp.="<tr><td><b>Money at max Level/XP: Raw:</b> " . $row["RewMoneyMaxLevel"] . "</td></tr>";
-                  if (isset ($row["RewXPId"]) && $row["RewXPId"] > 0)// WoTLK
-                      $temp.="<tr><td><b>RewXPId: Raw:</b> " . $row["RewXPId"] . "</td></tr>";
+                  if ($row["RewardMoneyMaxLevel"] > 0)
+                      $temp.="<tr><td><b>Money at max Level/XP: Raw:</b> " . $row["RewardMoneyMaxLevel"] . "</td></tr>";
+                  if (isset ($row["RewardXPId"]) && $row["RewardXPId"] > 0)// WoTLK
+                      $temp.="<tr><td><b>RewardXPId: Raw:</b> " . $row["RewardXPId"] . "</td></tr>";
                   if (isset($row["BonusTalents"]) && $row["BonusTalents"] > 0)// WoTLK
                       $temp.="<tr><td><b>Talent points:</b> " . $row["BonusTalents"] . "</td></tr>";
-                  if ($row["RewOrReqMoney"] > 0)
-                      $temp.="<tr><td><b>Money:</b> " . ($row["RewOrReqMoney"] >= 10000 ? floor($row["RewOrReqMoney"] / 10000) . "g" : "")
-                              . (($row["RewOrReqMoney"] % 10000) >= 100 ? floor(($row["RewOrReqMoney"] % 10000) / 100) . "s" : "")
-                              . (($row["RewOrReqMoney"] % 100) > 0 ? (($row["RewOrReqMoney"] % 100) . "c") : "")
+                  if ($row["RewardOrRequiredMoney"] > 0)
+                      $temp.="<tr><td><b>Money:</b> " . ($row["RewardOrRequiredMoney"] >= 10000 ? floor($row["RewardOrRequiredMoney"] / 10000) . "g" : "")
+                              . (($row["RewardOrRequiredMoney"] % 10000) >= 100 ? floor(($row["RewardOrRequiredMoney"] % 10000) / 100) . "s" : "")
+                              . (($row["RewardOrRequiredMoney"] % 100) > 0 ? (($row["RewardOrRequiredMoney"] % 100) . "c") : "")
                               . "</td></tr>";
-                  if ($row["RewSpellCast"] > 0 or $row["RewSpell"] > 0)
-                      $temp.="<tr><td><b>Spell:</b> " . ($row["RewSpell"] > 0 ? mysql_result(mysql_query("SELECT name FROM $trackerdb.spell WHERE id=" . $row["RewSpell"]), 0) : "") . ($row["RewSpellCast"] > 0 && $row["RewSpell"] > 0 ? " -> " : "") . ($row["RewSpellCast"] > 0 ? "Cast: " . mysql_result(mysql_query("SELECT name FROM $trackerdb.spell WHERE id=" . $row["RewSpellCast"]), 0) : "") . "</td></tr>";
+                  if ($row["RewardSpellCast"] > 0 or $row["RewardSpell"] > 0)
+                      $temp.="<tr><td><b>Spell:</b> " . ($row["RewardSpell"] > 0 ? mysql_result(mysql_query("SELECT name FROM $trackerdb.spell WHERE id=" . $row["RewardSpell"]), 0) : "") . ($row["RewardSpellCast"] > 0 && $row["RewardSpell"] > 0 ? " -> " : "") . ($row["RewardSpellCast"] > 0 ? "Cast: " . mysql_result(mysql_query("SELECT name FROM $trackerdb.spell WHERE id=" . $row["RewardSpellCast"]), 0) : "") . "</td></tr>";
                   if (isset($row["CharTitleId"]) && $row["CharTitleId"] > 0) //TBC
                       $temp.="<tr><td><b>Title:</b> " . mysql_result(mysql_query("SELECT name FROM $trackerdb.chartitles WHERE id=" . $row["CharTitleId"]), 0) . "</td></tr>";
-                  if ($row["RewMailTemplateId"] > 0)
+                  if ($row_addon["RewardMailTemplateID"] > 0)
                       $temp.="<tr><td><b>Item by Mail:</b> " . mysql_result(mysql_query("SELECT name FROM $trinitydb.item_template WHERE entry=(SELECT item FROM $trinitydb.quest_mail_loot_template WHERE entry=" . $quest . ")"), 0) . " after " . floor($row["RewMailDelaySecs"] / 60) . ":" . ($row["RewMailDelaySecs"] % 60 < 10 ? "0" : "") . ($row["RewMailDelaySecs"] % 60) . "</td></tr>";
 
                   if (!empty($temp)) {
@@ -1130,7 +1131,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                         $row["RequestItemsText"],
                         $row["RewSpellCast"],
                         $row["RewSpell"],
-                        $row["RewOrReqMoney"],
+                        $row["RewardOrRequiredMoney"],
                         $row["RewMoneyMaxLevel"],
                         $row["OfferRewardText"],
                         $row["QuestFlags"],
@@ -1156,7 +1157,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                         $row["NextQuestId"],
                         $row["NextQuestInChain"],
                         $row["ExclusiveGroup"],
-                        $row["RewXPId"],
+                        $row["RewardXPId"],
                         $row["CompletedText"],
                         $row["EndText"],
                         $row["IncompleteEmote"],
