@@ -886,10 +886,10 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                   }
 
                   echo "<fieldset><legend>Quest Texts</legend>";
-                  if (!empty($row["Details"]))
-                      echo "<p style=\"text-indent:-6em;margin-left:6em\"><b>Detail text:</b> <i>" . str_ireplace(array("\$b", "\$n", "\$r", "\$c", "\$g"), array("</br>", "&lt;Name&gt;", "&lt;Race&gt;", "&lt;Class&gt;", "&lt;Custom&gt;"), $row["Details"]) . "</i></p>";
-                  if (!empty($row["Objectives"]))
-                      echo "<p style=\"text-indent:-6em;margin-left:6em\"><b>Objectives text:</b> <i>" . str_ireplace(array("\$b", "\$n", "\$r", "\$c", "\$g"), array("</br>", "&lt;Name&gt;", "&lt;Race&gt;", "&lt;Class&gt;", "&lt;Custom&gt;"), $row["Objectives"]) . "</i></p>";
+                  if (!empty($row["QuestDescription"]))
+                      echo "<p style=\"text-indent:-6em;margin-left:6em\"><b>Detail text:</b> <i>" . str_ireplace(array("\$b", "\$n", "\$r", "\$c", "\$g"), array("</br>", "&lt;Name&gt;", "&lt;Race&gt;", "&lt;Class&gt;", "&lt;Custom&gt;"), $row["QuestDescription"]) . "</i></p>";
+                  if (!empty($row["LogDescription"]))
+                      echo "<p style=\"text-indent:-6em;margin-left:6em\"><b>Objectives text:</b> <i>" . str_ireplace(array("\$b", "\$n", "\$r", "\$c", "\$g"), array("</br>", "&lt;Name&gt;", "&lt;Race&gt;", "&lt;Class&gt;", "&lt;Custom&gt;"), $row["LogDescription"]) . "</i></p>";
                   if (!empty($row["RequestItemsText"]))
                       echo "<p style=\"text-indent:-6em;margin-left:6em\"><b>Progress text:</b> <i>" . str_ireplace(array("\$b", "\$n", "\$r", "\$c", "\$g"), array("</br>", "&lt;Name&gt;", "&lt;Race&gt;", "&lt;Class&gt;", "&lt;Custom&gt;"), $row["RequestItemsText"]) . "</i></p>";
                   if (!empty($row["OfferRewardText"]))
