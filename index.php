@@ -32,7 +32,8 @@ function get_queststatus($quest, $table=false)
         continue;
 
     if(isset($character_name) && isset($char_id)){
-        $char_quest_data= mysql_fetch_array(mysql_query("SELECT status, rewarded FROM $characterdb.character_queststatus WHERE guid = $char_id AND quest = ".$quest));
+        $char_quest_data= mysql_fetch_array(mysql_query("SELECT status FROM $characterdb.character_queststatus WHERE guid = $char_id AND quest = ".$quest));
+        $char_quest_data_rewarded= mysql_fetch_array(mysql_query("SELECT active FROM $characterdb.character_queststatus_rewarded WHERE guid = $char_id AND quest = ".$quest));
         if($table)
           $queststatus .= "</td><td>";
         switch ($char_quest_data["status"])
@@ -40,9 +41,9 @@ function get_queststatus($quest, $table=false)
             case 1: $queststatus .="<span class=\"tag tag_char_completed\" >$character_name completed</span> ";break;
             case 2: $queststatus .="<span class=\"tag tag_char_unavailable\" >$character_name unavailable</span> ";break;
             case 3: $queststatus .="<span class=\"tag tag_char_incomplete\" >$character_name incomplete</span> ";break;
-            case 4: $queststatus .="<span class=\"tag tag_char_available\" >$character_name available</span> ";break;
+            case 5: $queststatus .="<span class=\"tag tag_char_failed\" >$character_name failed</span> ";break;
         }
-        if($char_quest_data["rewarded"] == 1)
+        if($char_quest_data_rewarded["active"] == 1)
             $queststatus .="<span class=\"tag tag_char_rewarded\" >$character_name rewarded</span> ";
     }
 
@@ -293,7 +294,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
             .tag_horde    {background-color:#3f2d1d; color:#c92300; border-color: #929292; border-width:2px; border-style:solid}
             .tag_gray     {background-color:#ddd;    color:#eee;    border-color: #eee;    border-width:2px; border-style:solid}
 
-            .tag_char_available     {background-color:green;    color:white;}
+            .tag_char_available     {background-color:purple;    color:white;}
             .tag_char_unavailable   {background-color:red;    color:white;}
             .tag_char_incomplete    {background-color:orange;    color:white;}
             .tag_char_completed     {background-color:darkcyan;    color:white;}
@@ -632,7 +633,7 @@ if(isset($_GET["link_char"]) && isset($_POST["charname"]) && !empty($characterdb
                       $percent_unknown = 100 - $percent_not_completable - $percent_completable;
                       $group_status = "<span class=\"tag tag5\" title=completable>$percent_completable %</span> <span class=\"tag tag1\" title=\"not completable\">$percent_not_completable %</span> <span class=\"tag tag0\" title=\"unknown\">$percent_unknown %</span>";
                       if(isset($character_name) && isset($char_id)){
-                          $char_num_rewarded= mysql_result(mysql_query("SELECT count(quest) AS num FROM $characterdb.character_queststatus WHERE guid = $char_id AND quest IN (SELECT ID FROM $trinitydb.quest_template WHERE QuestSortID = ".$row["QuestSortID"].") AND rewarded = 1"),0);
+                          $char_num_rewarded= mysql_result(mysql_query("SELECT count(quest) AS num FROM $characterdb.character_queststatus_rewarded WHERE guid = $char_id AND quest IN (SELECT ID FROM $trinitydb.quest_template WHERE QuestSortID = ".$row["QuestSortID"].") AND active = 1"),0);
                           $group_status .=" <span class=\"tag tag_char_rewarded\">$character_name $char_num_rewarded/".$row["num"]." rewarded</span>";
                       }
                       echo "<tr><td><a href=index.php?showrev=" . $show_data_for_rev . "&filterstatus=" . $filter_status . "&map=" . $map . "&areasort=".$row["QuestSortID"].">" . $row["name"] . "</a></td><td>" . $row["num"] . "</td><td>$track_status</td><td>".$group_status."</td>";
